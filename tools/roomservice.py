@@ -20,6 +20,7 @@ from __future__ import print_function
 import json
 import sys
 import os
+import re
 from xml.etree import ElementTree as ES
 # Use the urllib importer from the Cyanogenmod roomservice
 try:
@@ -54,8 +55,9 @@ def check_repo_exists(git_data):
 
 # Note that this can only be done 5 times per minute
 def search_github_for_device(device):
+    git_device = '+'.join(re.findall('[a-z]+|[\d]+', device))
     git_search_url = "https://api.github.com/search/repositories" \
-                     "?q=%40{}+android_device+{}+fork:true".format(android_team, device)
+                     "?q=%40{}+android_device+{}+fork:true".format(android_team, git_device)
     git_req = urllib.request.Request(git_search_url)
     # this api is a preview at the moment. accept the custom media type
     git_req.add_header('Accept', 'application/vnd.github.preview')
@@ -85,7 +87,7 @@ def get_device_url(git_data):
                     break
 
     if device_url:
-        return device_url
+        return "{}/{}".format(android_team, device_url)
     raise Exception("{} not found in {} Github, exiting "
                     "roomservice".format(device, android_team))
 
@@ -100,7 +102,7 @@ def parse_device_directory(device_url,device):
 
 
 # Thank you RaYmAn
-def iterate_manifests():
+def iterate_manifests(check_all):
     files = []
     for file in os.listdir(local_manifest_dir):
         if file.endswith(".xml"):
@@ -118,18 +120,24 @@ def iterate_manifests():
 
 
 def check_project_exists(url, revision, path):
-    for project in iterate_manifests():
+    for project in iterate_manifests(True):
         if project.get("name") == url and project.get("revision") == revision and project.get("path") == path:
             return True
     return False
 
+def check_dup_path(directory):
+    for project in iterate_manifests(False):
+        if project.get("path") == directory:
+            print ("Duplicate path %s found! Removing" % directory)
+            return project.get("name")
+    return None
 
 # Use the indent function from http://stackoverflow.com/a/4590052
 def indent(elem, level=0):
-    i = ''.join(["\n", level*"  "])
+    i = ''.join(["\n", level*" "])
     if len(elem):
         if not elem.text or not elem.text.strip():
-            elem.text = ''.join([i, "  "])
+            elem.text = ''.join([i, " "])
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for elem in elem:
@@ -149,6 +157,12 @@ def create_manifest_project(url, directory,
     if project_exists:
         return None
 
+    dup_path = check_dup_path(directory)
+    if not dup_path is None:
+            write_to_manifest(
+                append_to_manifest(
+                    create_manifest_remove(dup_path)))
+
     project = ES.Element("project",
                          attrib={
                              "path": directory,
@@ -157,6 +171,11 @@ def create_manifest_project(url, directory,
                              "revision": revision
                          })
     return project
+
+
+def create_manifest_remove(url):
+    remove = ES.Element("remove-project", attrib={"name": url})
+    return remove
 
 
 def append_to_manifest(project):
@@ -178,11 +197,11 @@ def write_to_manifest(manifest):
 
     with open('/'.join([local_manifest_dir, "roomservice.xml"]), 'w') as f:
         f.write(raw_xml)
-    print("wrote the new roomservice manifest")
+    print("Written the new roomservice manifest")
 
 
 def parse_device_from_manifest(device):
-    for project in iterate_manifests():
+    for project in iterate_manifests(True):
         name = project.get('name')
         if name.startswith("android_device_") and name.endswith(device):
             return project.get('path')
@@ -201,7 +220,7 @@ def parse_device_from_folder(device):
     elif len(search) == 1:
         location = search[0]
     else:
-        print("Your device can't be found in device sources..")
+        print("Your device was not found. Attempting to retrieve device repository from MinimalOS-AOSP's Github..")
         location = parse_device_from_manifest(device)
     return location
 
