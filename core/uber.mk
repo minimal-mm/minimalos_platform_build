@@ -99,7 +99,9 @@ LOCAL_DISABLE_STRICT := \
 	sensors.flounder \
 	libnvvisualizer \
 	libskia \
-	libiprouteutil
+	libiprouteutil \
+        tcpdump \
+        fio
 
 LOCAL_FORCE_DISABLE_STRICT := \
 	libziparchive-host \
