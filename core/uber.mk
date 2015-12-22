@@ -101,7 +101,8 @@ LOCAL_DISABLE_STRICT := \
 	libskia \
 	libiprouteutil \
         tcpdump \
-        fio
+        fio \
+        libskia
 
 LOCAL_FORCE_DISABLE_STRICT := \
 	libziparchive-host \
@@ -129,7 +130,8 @@ LOCAL_FORCE_DISABLE_STRICT := \
 	libc_malloc \
 	sensors.flounder \
 	libnvvisualizer \
-	libiprouteutil
+	libiprouteutil \
+        libskia
 
 DISABLE_STRICT := \
 	-fno-strict-aliasing
