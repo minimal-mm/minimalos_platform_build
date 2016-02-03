@@ -37,7 +37,7 @@ except ImportError:
 # set this to the default remote to use in repo
 default_rem = "github"
 # set this to the default revision to use (branch/tag name)
-default_rev = "mm-6.0"
+default_rev = "mr1"
 # set this to the remote that you use for projects from your team repos
 # example fetch="https://github.com/MinimalOS-AOSP"
 default_team_rem = "github"
@@ -261,7 +261,7 @@ def create_dependency_manifest(dependencies):
             write_to_manifest(manifest)
             projects.append(target_path)
     if len(projects) > 0:
-        os.system("repo sync -f --no-clone-bundle %s" % " ".join(projects))
+        os.system("repo sync --force-sync --no-clone-bundle %s" % " ".join(projects))
 
 
 def fetch_dependencies(device):
