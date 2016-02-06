@@ -27,6 +27,7 @@ PRODUCT_PACKAGES := \
 	Gallery \
 	GestureBuilder \
 	Launcher3 \
+  SMSSecure \
 	librs_jni \
 	LiveWallpapersPicker \
 	rild \

@@ -21,13 +21,17 @@
 # core_tiny.mk in addition to core_minimal.mk.
 
 PRODUCT_PACKAGES += \
+    Browser \
+    Calendar \
     CalendarProvider \
     CaptivePortalLogin \
     CertInstaller \
     Contacts \
     DocumentsUI \
     DownloadProviderUi \
-    ExactCalculator \
+    Exchange2 \
+    Email \
+    Calculator \
     ExternalStorageProvider \
     FusedLocation \
     InputDevices \
