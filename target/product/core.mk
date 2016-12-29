@@ -32,7 +32,7 @@ PRODUCT_PACKAGES += \
     DownloadProviderUi \
     Exchange2 \
     Email \
-    Calculator \
+    ExactCalculator \
     ExternalStorageProvider \
     FusedLocation \
     InputDevices \
